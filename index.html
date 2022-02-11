@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--Want to contribute/suggest fixes? https://github.com/stedy/FOSEmap><--!>
+<html lang="en">
+<head>
+
+	<title>FOSE Mobile map</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		.leaflet-container {
+			height: 400px;
+			width: 600px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+	</style>
+
+	<style>body { padding: 0; margin: 0; } #map { height: 100%; width: 100vw; }</style>
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+  var corner1 = L.latLng(47.72635344342975,-122.24107804315132),
+  corner2 = L.latLng(47.51118274442948,-122.41756580535167),
+  bounds = L.latLngBounds(corner1, corner2)
+
+  var map = L.map('map', {tap: false}).fitBounds(bounds);
+
+	var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1
+	}).addTo(map);
+
+
+ $.getJSON("Street_Ends__Shoreline_.geojson", function(data) {
+    var geojson = L.geoJson(data, {
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(feature.properties.UNITDESC);
+      }
+    });
+    geojson.addTo(map);
+  });
+
+
+	function onLocationFound(e) {
+		var radius = e.accuracy / 2;
+
+		var locationMarker = L.marker(e.latlng).addTo(map)
+      .bindPopup('You are within ' + radius + ' meters from this point.<br> Zoom out to find the street end park nearest to you').openPopup();
+
+		var locationCircle = L.circle(e.latlng, radius).addTo(map);
+	}
+
+
+
+	function onLocationError(e) {
+    alert('Turn on location services to see street end parks near you');
+	}
+
+	map.on('locationfound', onLocationFound);
+	map.on('locationerror', onLocationError);
+
+	map.locate({setView: true, maxZoom: 16});
+</script>
+
+
+
+</body>
+</html>
+
