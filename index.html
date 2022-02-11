@@ -51,7 +51,7 @@
 	}).addTo(map);
 
 
- $.getJSON("Street_Ends__Shoreline_.geojson", function(data) {
+ $.getJSON("FOSE.geojson", function(data) {
     var geojson = L.geoJson(data, {
       onEachFeature: function (feature, layer) {
         layer.bindPopup(feature.properties.UNITDESC);
